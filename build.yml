@@ -1,0 +1,45 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Create Android project
+        run: |
+          npm init -y
+          npm i @capacitor/core @capacitor/cli @capacitor/android
+          mkdir www && cp index.html www/
+          npx cap init Flapper com.flapper.game --web-dir www
+          npx cap add android
+          npx cap sync android
+      - name: Fixed signing key and version
+        run: |
+          mkdir -p ~/.android
+          echo "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" | base64 -d > ~/.android/debug.keystore
+          keytool -list -keystore ~/.android/debug.keystore -storepass android | grep -i "SHA"
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n "versionCode" android/app/build.gradle
+      - name: Apply icon
+        run: |
+          if [ -f icon.png ]; then
+            mkdir -p assets && cp icon.png assets/icon.png
+            npm i @capacitor/assets
+            npx capacitor-assets generate --android --iconBackgroundColor '#131314' --iconBackgroundColorDark '#131314'
+          fi
+      - name: Build
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Flapper-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
